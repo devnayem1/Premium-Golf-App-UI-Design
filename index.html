@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AXYS Kinetics G1 – App Design Prototype</title>
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== Design tokens (logo colours taken from the supplied PDF: #8DC63F, #6D6E71, #FFF, #000) ===== */
+:root{--bg:#000;--s1:#121314;--s2:#1c1d1f;--line:#2d2e31;--tx:#fff;--mut:#a3a4a7;--grey:#6d6e71;--g:#8dc63f;--red:#ff0040;--yel:#ecee0e;--r:16px}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:#0c0c0d;color:var(--tx);font-family:Jost,Futura,"Century Gothic",system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+#phone{position:relative;width:100%;height:100dvh;background:var(--bg);overflow:hidden;display:flex;flex-direction:column}
+@media(min-width:600px){body{display:grid;place-items:center}#phone{width:390px;height:844px;max-height:96vh;border-radius:44px;border:9px solid #1e1f21;box-shadow:0 30px 80px #000a}}
+.hd{display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top,0px) + 10px) 14px 6px;min-height:58px;flex:none}
+.hd .logo{width:92px;height:auto}
+.ib{width:44px;height:44px;display:grid;place-items:center;border-radius:12px}
+.bat{display:flex;align-items:center;gap:6px;font-size:15px;min-width:44px;justify-content:flex-end}
+main{flex:1;overflow:auto;padding:4px 20px calc(env(safe-area-inset-bottom,0px) + 24px);scrollbar-width:none}
+main::-webkit-scrollbar{display:none}
+h1{font-weight:300;font-size:26px;letter-spacing:.04em;text-align:center;text-transform:uppercase;margin:4px 0 14px}
+h2{font-weight:500;font-size:13px;letter-spacing:.12em;color:var(--mut);text-transform:uppercase;margin-bottom:8px}
+.c{text-align:center}.mut{color:var(--mut)}.sm{font-size:13px}.g{color:var(--g)}.r{color:var(--red)}.y{color:var(--yel)}
+.card{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.row{display:flex;align-items:center;gap:10px}.sp{justify-content:space-between}.col{display:flex;flex-direction:column;gap:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat b{display:block;font-size:30px;font-weight:400;line-height:1.1}.stat span{font-size:13px;color:var(--mut)}
+/* Buttons: default / pressed / focus / disabled / loading / success / error */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;padding:0 22px;border-radius:999px;background:var(--grey);color:#fff;font-size:19px;letter-spacing:.04em;text-transform:uppercase;transition:transform .12s,filter .12s,background .2s}
+.btn.pri{background:var(--g);color:#000;font-weight:500}
+.btn.sec{background:transparent;border:1.5px solid var(--grey)}
+.btn.sm{min-height:44px;font-size:15px;width:auto}
+.btn:active,.btn.is-pressed{transform:scale(.96);filter:brightness(.8)}
+.btn:focus-visible,.ib:focus-visible,.chip:focus-visible,input:focus-visible,select:focus-visible,.mk:focus-visible,.sw:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.btn:disabled,.btn.is-disabled{opacity:.4;cursor:not-allowed;transform:none;filter:none}
+.btn.loading{pointer-events:none}.btn.loading::before{content:"";width:16px;height:16px;border:2.5px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite}
+.btn.ok{background:#1f3a0c;color:var(--g);border:1.5px solid var(--g)}.btn.err{background:transparent;color:var(--red);border:1.5px solid var(--red)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:999px;border:1.5px solid var(--line);font-size:14px;white-space:nowrap}
+.chip[aria-pressed=true],.chip[aria-checked=true]{border-color:var(--g);color:var(--g);background:#8dc63f14}
+.scroll{display:flex;gap:8px;overflow:auto;padding-bottom:6px;scrollbar-width:none;margin:0 -20px;padding-inline:20px}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1.5px solid currentColor}
+.bar{height:10px;border-radius:9px;background:#2a2b2e;overflow:hidden}.bar i{display:block;height:100%;background:var(--g);border-radius:9px;transition:width .25s}
+.seg{display:flex;gap:4px}.seg i{flex:1;height:10px;border-radius:5px;background:#2a2b2e;transition:background .3s}.seg i.on{background:var(--g)}
+.sw{width:54px;height:32px;border-radius:99px;background:#3a3b3e;position:relative;flex:none;transition:background .2s}.sw::after{content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s}.sw[aria-checked=true]{background:var(--g)}.sw[aria-checked=true]::after{transform:translateX(22px);background:#000}
+.stage{background:#17181a;border-radius:var(--r);position:relative;overflow:hidden}
+.stage svg{display:block;width:100%;height:100%}
+.tag{position:absolute;font-size:12px;letter-spacing:.06em;padding:4px 9px;border-radius:99px;background:#000a;text-transform:uppercase}
+.gradbar{height:12px;border-radius:9px;background:linear-gradient(90deg,var(--red),#f97316 30%,var(--yel) 55%,var(--g));position:relative;margin:14px 0 6px}
+.gradbar i{position:absolute;top:-6px;width:4px;height:24px;background:#fff;border-radius:2px;transform:translateX(-2px)}
+/* swing scrubber */
+.scrub{position:relative;height:84px;margin:6px 0}
+.scrub .trk{position:absolute;left:14px;right:14px;top:42px;height:16px;border-radius:9px}
+.scrub input{position:absolute;left:0;right:0;top:36px;width:100%;height:28px;appearance:none;background:none;margin:0}
+.scrub input::-webkit-slider-thumb{appearance:none;width:30px;height:30px;border-radius:50%;background:#fff;border:6px solid #3a3b3e}
+.scrub input::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:6px solid #3a3b3e}
+.mk{position:absolute;top:0;width:34px;height:34px;margin-left:-17px;border-radius:50%;border:2px solid var(--grey);background:#000;font-size:14px;transition:.2s}
+.mk[aria-pressed=true]{background:#fff;color:#000;border-color:#fff;transform:scale(1.12)}
+.drawer{position:absolute;inset:0;z-index:20;display:flex;visibility:hidden}.drawer.open{visibility:visible}
+.drawer .sh{position:absolute;inset:0;background:#000c;opacity:0;transition:opacity .25s}.drawer.open .sh{opacity:1}
+.drawer nav{position:relative;width:82%;max-width:320px;background:var(--s1);border-right:1px solid var(--line);padding:calc(env(safe-area-inset-top,0px) + 14px) 14px 20px;transform:translateX(-100%);transition:transform .25s;overflow:auto}
+.drawer.open nav{transform:none}
+.nv{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;padding:0 12px;border-radius:12px;text-align:left;font-size:17px;border-left:3px solid transparent}
+.nv i{font-style:normal;width:22px;color:var(--mut);font-size:14px}
+.nv[aria-current=page]{background:#8dc63f1a;border-left-color:var(--g);color:var(--g)}
+.modal{position:absolute;inset:0;z-index:30;display:flex;align-items:flex-end;background:#000b}
+.modal[hidden]{display:none}
+.modal>div{width:100%;max-height:92%;overflow:auto;background:var(--s1);border-radius:24px 24px 0 0;padding:20px 20px calc(env(safe-area-inset-bottom,0px) + 22px);border-top:1px solid var(--line)}
+label{display:block;font-size:14px;color:var(--mut);margin:10px 0 4px}
+input,select{width:100%;min-height:48px;border-radius:12px;border:1.5px solid var(--line);background:#000;color:#fff;font:inherit;font-size:17px;padding:0 14px}
+input[aria-invalid=true]{border-color:var(--red)}.er{color:var(--red);font-size:13px;min-height:18px;margin-top:4px}
+#toast{position:absolute;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:40;background:#1f2a14;border:1px solid var(--g);color:#fff;padding:12px 16px;border-radius:14px;font-size:15px;transform:translateY(160%);transition:transform .25s}
+#toast.show{transform:none}#toast.bad{background:#2a0a14;border-color:var(--red)}
+.pulse{animation:pl .9s ease-out 1}@keyframes pl{0%{box-shadow:0 0 0 0 #8dc63f99}100%{box-shadow:0 0 0 22px #8dc63f00}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><g id="lg"><path fill="#6d6e71" d="M 154.503906 172.574219 L 158.039062 169.015625 L 159.285156 169.015625 L 155.398438 172.886719 L 159.40625 177.316406 L 158.140625 177.316406 L 154.742188 173.507812 L 154.503906 173.746094 L 154.503906 177.316406 L 153.582031 177.316406 L 153.582031 169.015625 L 154.503906 169.015625 Z M 154.503906 172.574219 "/><path fill="#6d6e71" d="M 179.320312 177.320312 L 180.242188 177.320312 L 180.242188 169.015625 L 179.320312 169.015625 Z M 179.320312 177.320312 "/><path fill="#6d6e71" d="M 201.046875 177.316406 L 201.046875 168.664062 L 207.519531 175.449219 L 207.519531 169.015625 L 208.441406 169.015625 L 208.441406 177.691406 L 201.964844 170.90625 L 201.964844 177.316406 Z M 201.046875 177.316406 "/><path fill="#6d6e71" d="M 233.554688 169.886719 L 230.167969 169.886719 L 230.167969 172.351562 L 233.453125 172.351562 L 233.453125 173.222656 L 230.167969 173.222656 L 230.167969 176.445312 L 233.554688 176.445312 L 233.554688 177.316406 L 229.246094 177.316406 L 229.246094 169.015625 L 233.554688 169.015625 Z M 233.554688 169.886719 "/><path fill="#6d6e71" d="M 255.953125 169.886719 L 255.953125 177.316406 L 255.035156 177.316406 L 255.035156 169.886719 L 253.015625 169.886719 L 253.015625 169.015625 L 257.972656 169.015625 L 257.972656 169.886719 Z M 255.953125 169.886719 "/><path fill="#6d6e71" d="M 277.882812 177.320312 L 278.800781 177.320312 L 278.800781 169.015625 L 277.882812 169.015625 Z M 277.882812 177.320312 "/><path fill="#6d6e71" d="M 305.957031 170.84375 C 305.695312 170.582031 305.296875 170.269531 304.875 170.074219 C 304.4375 169.871094 303.929688 169.75 303.441406 169.75 C 301.527344 169.75 300.105469 171.292969 300.105469 173.210938 C 300.105469 175.464844 301.9375 176.59375 303.453125 176.59375 C 304.015625 176.59375 304.5625 176.433594 305 176.210938 C 305.472656 175.972656 305.808594 175.660156 305.957031 175.511719 L 305.957031 176.65625 C 305.035156 177.316406 304.078125 177.46875 303.453125 177.46875 C 300.988281 177.46875 299.160156 175.601562 299.160156 173.195312 C 299.160156 170.71875 301.015625 168.878906 303.503906 168.878906 C 304.003906 168.878906 304.960938 168.9375 305.957031 169.699219 Z M 305.957031 170.84375 "/><path fill="#6d6e71" d="M 330.027344 170.65625 C 329.914062 170.433594 329.726562 170.183594 329.539062 170.035156 C 329.378906 169.910156 329.078125 169.75 328.605469 169.75 C 327.785156 169.75 327.214844 170.261719 327.214844 171.03125 C 327.214844 171.355469 327.300781 171.542969 327.523438 171.753906 C 327.773438 172.003906 328.085938 172.136719 328.394531 172.277344 L 329.191406 172.625 C 329.675781 172.835938 330.125 173.058594 330.472656 173.410156 C 330.898438 173.832031 331.070312 174.316406 331.070312 174.914062 C 331.070312 176.445312 329.9375 177.46875 328.445312 177.46875 C 327.898438 177.46875 327.214844 177.355469 326.640625 176.792969 C 326.230469 176.394531 325.980469 175.824219 325.867188 175.324219 L 326.765625 175.078125 C 326.828125 175.511719 327.027344 175.886719 327.261719 176.132812 C 327.621094 176.496094 328.035156 176.59375 328.457031 176.59375 C 329.589844 176.59375 330.125 175.789062 330.125 174.953125 C 330.125 174.578125 330.011719 174.253906 329.714844 173.980469 C 329.476562 173.757812 329.15625 173.609375 328.71875 173.410156 L 327.972656 173.058594 C 327.648438 172.910156 327.238281 172.738281 326.863281 172.375 C 326.503906 172.027344 326.292969 171.640625 326.292969 171.019531 C 326.292969 169.734375 327.273438 168.878906 328.621094 168.878906 C 329.128906 168.878906 329.539062 168.976562 329.953125 169.25 C 330.289062 169.472656 330.574219 169.808594 330.761719 170.171875 Z M 330.027344 170.65625 "/><path fill="#8dc63f" d="M 239.4375 213.945312 L 248.78125 213.945312 C 248.78125 215.980469 248.347656 218.917969 246.511719 221.253906 C 244.542969 223.753906 241.539062 224.992188 238.136719 224.992188 C 231.59375 224.992188 226.625 220.183594 226.625 213.542969 C 226.625 206.9375 231.761719 202.066406 238.238281 202.066406 C 241.375 202.066406 243.476562 203.132812 245.210938 204.46875 C 246.144531 205.203125 246.980469 206.003906 247.878906 207.269531 L 246.710938 208.203125 C 246.078125 207.136719 245.175781 206.234375 244.578125 205.734375 C 243.175781 204.566406 240.972656 203.398438 238.203125 203.398438 C 232.496094 203.398438 228.160156 207.9375 228.160156 213.613281 C 228.160156 219.183594 232.363281 223.65625 238.101562 223.65625 C 241.90625 223.65625 244.644531 221.71875 245.84375 219.886719 C 246.710938 218.550781 247.246094 216.714844 247.3125 215.28125 L 239.4375 215.28125 Z M 239.4375 213.945312 "/><path fill="#fff" d="M 258.289062 206.703125 L 255.121094 206.703125 L 255.121094 202.363281 L 263.429688 202.363281 L 263.429688 224.625 L 258.289062 224.625 Z M 258.289062 206.703125 "/><path fill="#fff" d="M 104.953125 147.585938 L 134.988281 124.558594 L 165.023438 147.585938 L 171.589844 147.585938 L 134.988281 119.523438 L 98.386719 147.585938 Z M 104.953125 147.585938 "/><path fill="#fff" d="M 256.1875 120.042969 L 245.316406 120.042969 L 214.972656 131.675781 L 184.628906 120.042969 L 173.761719 120.042969 L 173.722656 120.140625 L 209.394531 133.816406 L 173.722656 147.488281 L 173.761719 147.585938 L 184.628906 147.585938 L 214.972656 135.953125 L 245.320312 147.585938 L 256.1875 147.585938 L 256.222656 147.488281 L 220.554688 133.816406 L 256.222656 120.140625 Z M 256.1875 120.042969 "/><path fill="#fff" d="M 294.292969 136.398438 Z M 292.292969 147.585938 L 296.289062 147.585938 L 296.289062 137.625 L 330.695312 120.042969 L 321.914062 120.042969 L 294.292969 134.15625 L 266.667969 120.042969 L 257.890625 120.042969 L 292.292969 137.621094 Z M 292.292969 147.585938 "/><path fill="#fff" d="M 377.933594 131.816406 L 338.183594 131.816406 C 336.039062 131.816406 334.292969 130.074219 334.292969 127.929688 C 334.292969 125.785156 335.980469 124.039062 338.050781 124.039062 L 377.902344 124.039062 L 385.820312 120.042969 L 338.050781 120.042969 C 333.777344 120.042969 330.300781 123.582031 330.300781 127.929688 C 330.300781 132.273438 333.835938 135.8125 338.183594 135.8125 L 377.933594 135.8125 C 380.078125 135.8125 381.824219 137.558594 381.824219 139.703125 C 381.824219 141.847656 380.140625 143.59375 378.074219 143.59375 L 338.101562 143.59375 L 330.300781 147.53125 L 330.300781 147.585938 L 378.074219 147.585938 C 382.34375 147.585938 385.820312 144.050781 385.820312 139.703125 C 385.820312 135.355469 382.28125 131.816406 377.933594 131.816406 "/></g></defs></svg>
+<div id="phone">
+<header class="hd">
+ <button class="ib" id="mb" data-a="menu" aria-label="Open menu" aria-expanded="false"></button>
+ <button class="ib" style="width:auto;padding:0 6px" data-a="home" aria-label="AXYS – go to Home"><svg class="logo" viewBox="100 115 285 40" aria-hidden="true"><use href="#lg"/></svg></button>
+ <div class="bat" role="img" aria-label="Phone battery 68 percent"><span>68%</span>
+  <svg width="38" height="20" viewBox="0 0 38 20" aria-hidden="true"><defs><linearGradient id="bg"><stop offset="0" stop-color="#4a6a10"/><stop offset="1" stop-color="#8dc63f"/></linearGradient></defs><rect x="1" y="1" width="32" height="18" rx="4" fill="none" stroke="#fff" stroke-width="2"/><rect x="4" y="4" width="19.5" height="12" rx="2" fill="url(#bg)"/><rect x="34.5" y="6.5" width="3" height="7" rx="1.5" fill="#fff"/></svg></div>
+</header>
+<main id="main"></main>
+<div class="drawer" id="drawer"><div class="sh" data-a="closeMenu"></div><nav id="nav" aria-label="Main menu"></nav></div>
+<div id="modal" hidden></div>
+<div id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+/* ===== Helpers & icons ===== */
+const $=s=>document.querySelector(s);
+const IC={menu:'M4 7h16M4 12h16M4 17h16',check:'M5 12l5 5 9-10',x:'M6 6l12 12M18 6L6 18',warn:'M12 4l9 16H3zM12 10v4M12 17v.5',dash:'M7 12h10',cam:'M3 8h4l2-3h6l2 3h4v11H3zM12 17a3.5 3.5 0 100-7 3.5 3.5 0 000 7',play:'M7 5l12 7-12 7z',pause:'M8 5v14M16 5v14',vol:'M4 9v6h4l5 4V5L8 9zM17 9a4 4 0 010 6',vib:'M8 5h8v14H8zM4 9v6M20 9v6',info:'M12 8v.5M12 11v6M12 3a9 9 0 100 18 9 9 0 000-18',refresh:'M4 12a8 8 0 0114-5l2 2M20 4v5h-5M20 12a8 8 0 01-14 5l-2-2M4 20v-5h5',bt:'M7 7l10 10-5 4V3l5 4L7 17',edit:'M4 20h4L19 9l-4-4L4 16zM13 7l4 4'};
+const ic=(n,s=20,f)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="${f?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${IC[n]}"/></svg>`;
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const pad=n=>String(n).padStart(2,'0');
+$('#mb').innerHTML=ic('menu',28);
+
+/* ===== Demonstration data (all editable) ===== */
+const SCREENS=[['system','System & Sensors'],['profile','Personal Profile'],['calib','Calibration'],['drill','Drill Training'],['shots','Shot Taking'],['complete','Shots Complete'],['overview','Swing Overview'],['video','Explainer Video']];
+/* Six swing phases – demonstration terminology, replace once AXYS confirms official names. Take Away text is from the client PDF. */
+const PH=[
+ {n:'Address',st:'ok',f:'Balanced Set-up',d:'Spine tilted forward, weight evenly spread, arms hanging naturally.'},
+ {n:'Take Away',st:'ok',f:'On Plane',d:'Right shoulder moving too far towards the ball. Elbow trapped behind body.'},
+ {n:'Top of Backswing',st:'ok',f:'Strong Position',d:'Lead arm extended and shoulders turned fully behind the ball.'},
+ {n:'Start of Downswing',st:'bad',f:'Arms Lead the Torso',d:'Arms start down before the torso rotates, pulling the club outside the plane.'},
+ {n:'Impact',st:'warn',f:'Early Release',d:'Wrist angle opens early, losing stored angle before the ball.'},
+ {n:'Finish',st:'warn',f:'Weight Held Back',d:'Weight stays on the trail foot, leaving the finish unbalanced.'}];
+const EXTRA=[['home','Home'],['plan','Improvement Plan']];const DR=[['Arm & Torso Separation','bad'],['Forearm Rotation','warn'],['Wrist Angle','warn']];const VIDEO_SRC='';/* set to a video URL to use a real video */
+const STC={ok:'var(--g)',warn:'var(--yel)',bad:'var(--red)'},STL={ok:'In range',warn:'Needs attention',bad:'Out of range'};
+const PRESETS={A:['All connected',{ble:1,hand:1,wrist:1,bicep:1,fw:1,cam:1,pos:1,cal:0}],B:['Sensor off',{ble:1,hand:0,wrist:1,bicep:1,fw:1,cam:1,pos:1,cal:100}],C:['Bluetooth off',{ble:0,hand:0,wrist:0,bicep:0,fw:1,cam:1,pos:1,cal:100}],D:['Firmware',{ble:1,hand:1,wrist:1,bicep:1,fw:0,cam:1,pos:1,cal:100}],E:['Camera position',{ble:1,hand:1,wrist:1,bicep:1,fw:1,cam:1,pos:0,cal:100}],F:['Calibration',{ble:1,hand:1,wrist:1,bicep:1,fw:1,cam:1,pos:1,cal:60}],G:['Ready',{ble:1,hand:1,wrist:1,bicep:1,fw:1,cam:1,pos:1,cal:100}]};
+const mkState=()=>({screen:'home',hist:[],dn:'Arm & Torso Separation',preset:'B',sys:{...PRESETS.B[1]},fwBusy:false,
+ prof:{name:'James Carter',email:'james.carter@example.com',hand:'Right',hcp:18,pro:false},
+ cal:{step:0,mis:.55,gt:0,from:0,aligning:false,done:false,voice:false,hap:false,adv:0},
+ drill:{tempo:50,reps:0,ok:0,run:false,paused:false,done:false,p:0,dev:0,fr:0,inr:0},
+ shots:{club:'7 Iron',need:10,n:0,started:false,paused:false,lock:false,done:false},
+ sw:{t:.2,play:false},vid:{pos:0,play:false,end:false,dur:24}});
+let S=mkState();
+
+/* ===== Avatar: joint keyframes per phase, interpolated (illustrative, NOT sensor data) ===== */
+//        hipDx shW shX shY headX headY handX handY clubX clubY
+const K=[[0,26,100,92,98,70,102,152,126,226],[-3,22,96,94,94,71,74,140,22,150],[-7,12,90,96,88,74,80,58,36,40],[4,16,94,95,90,74,86,104,40,92],[8,24,102,92,100,70,104,150,128,226],[12,14,110,88,108,68,126,70,168,58]];
+function pose(t){t=cl(t);const x=t*5,i=Math.min(4,Math.floor(x)),f=x-i,s=f*f*(3-2*f);return K[i].map((v,j)=>v+(K[i+1][j]-v)*s)}
+function fig(p,o={}){const[hd,w,sx,sy,hx_,hy_,hx,hy,cx,cy]=p,hip=100+hd,col=o.ghost?'#8dc63f':(o.col||'#dcdedf'),op=o.ghost?.42:1;
+ const ln=(a,b,w2)=>`<path d="M${a[0]} ${a[1]}L${b[0]} ${b[1]}" stroke-width="${w2}"/>`,L=[sx-w,sy],R=[sx+w,sy],el=s=>[(s[0]+hx)/2,(s[1]+hy)/2+12];
+ return `<g stroke="${col}" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="${op}">`+
+ ln([hip-10,152],[hip-16,200],11)+ln([hip-16,200],[78,246],10)+ln([hip+10,152],[hip+16,200],11)+ln([hip+16,200],[124,246],10)+
+ ln([hip,152],[sx,sy],26)+ln(L,R,11)+ln([sx,sy],[hx_,hy_+10],7)+`<circle cx="${hx_}" cy="${hy_}" r="12" fill="${col}" stroke="none"/>`+
+ ln(L,el(L),8)+ln(el(L),[hx,hy],7)+ln(R,el(R),8)+ln(el(R),[hx,hy],7)+
+ `<path d="M${hx} ${hy}L${cx} ${cy}" stroke="${o.ghost?col:'#8b8d90'}" stroke-width="2.5"/><circle cx="${cx}" cy="${cy}" r="4" fill="${o.ghost?col:'#8b8d90'}" stroke="none"/></g>`}
+function trail(t,i,c){if(t<.01)return'';let a=[];for(let k=0;k<=40;k++){const p=pose(k/40*t);a.push(p[i].toFixed(1)+' '+p[i+1].toFixed(1))}return `<path d="M${a.join('L')}" fill="none" stroke="${c}" stroke-width="2" opacity=".9"/>`}
+const ball='<circle cx="134" cy="238" r="4" fill="#fff"/><ellipse cx="100" cy="252" rx="70" ry="5" fill="#fff" opacity=".07"/>';
+const avSvg=(inner,lbl)=>`<svg viewBox="0 0 200 270" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${lbl}">${inner}</svg>`;
+
+/* ===== UI primitives ===== */
+let toastT;function toast(m,bad){const t=$('#toast');t.textContent=m;t.className='show'+(bad?' bad':'');clearTimeout(toastT);toastT=setTimeout(()=>t.className='',2600)}
+function modal(h){const m=$('#modal');m.className='modal';m.hidden=false;m.innerHTML=`<div role="dialog" aria-modal="true">${h}</div>`;const f=m.querySelector('input,button');f&&f.focus()}
+function closeModal(){const m=$('#modal');m.hidden=true;m.innerHTML=''}
+const btn=(a,t,c='',x='')=>`<button class="btn ${c}" data-a="${a}" ${x}>${t}</button>`;
+function buzz(){S.cal.hap=true;navigator.vibrate&&navigator.vibrate(70)}
+function speak(t){if(S.cal.voice&&'speechSynthesis' in window){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(t))}}
+
+/* ===== Drawer ===== */
+function drawer(open){const d=$('#drawer'),was=d.classList.contains('open');d.classList.toggle('open',open);$('#mb').setAttribute('aria-expanded',open);
+ $('#nav').innerHTML=`<svg viewBox="100 115 285 125" style="width:150px;margin:6px 8px 14px" aria-label="AXYS Kinetics G1" role="img"><use href="#lg"/></svg>`+`<button class="nv" data-a="go" data-id="home" ${S.screen==='home'?'aria-current="page"':''}><i>⌂</i>Home</button>`+SCREENS.map((s,i)=>`<button class="nv" data-a="go" data-id="${s[0]}" ${S.screen===s[0]?'aria-current="page"':''}><i>${i+1}</i>${s[1]}</button>`).join('')+`<button class="nv" data-a="go" data-id="plan" ${S.screen==='plan'?'aria-current="page"':''}><i>+</i>Improvement plan</button><hr style="border:0;border-top:1px solid var(--line);margin:12px 0"><button class="nv" data-a="btnstates"><i>${ic('info',16)}</i>Button states</button><button class="nv" data-a="reset"><i>${ic('refresh',16)}</i>Reset demo</button><p class="sm mut" style="padding:12px">Prototype · simulated data only</p>`;
+ if(open)setTimeout(()=>$('#nav .nv[aria-current]').focus(),60);else if(was)$('#mb').focus({preventScroll:true})}
+
+const dn=()=>S.dn.replace(/&/g,'&amp;');
+function homeView(){const s=S.shots,can=s.started&&!s.done;return `<div class="c" style="padding-top:8px"><svg viewBox="100 115 285 125" style="width:230px" role="img" aria-label="AXYS Kinetics G1"><use href="#lg"/></svg><p style="font-size:26px;font-weight:300;margin:26px 0 24px;line-height:1.3">Welcome back<br>${S.prof.name.split(' ')[0]}</p></div><div class="col">${btn('go','Swing analysis','',`data-id="shots"`)}${btn('go','Resume last session','',can?`data-id="shots"`:'disabled')}${btn('go','Tempo trainer','',`data-id="drill"`)}${btn('x','Driving range','','disabled')}</div><p class="sm mut c" style="margin:10px 0 16px">${can?'':'Resume is available once a session is started. '}Driving range is outside the current 8-screen scope.</p><div class="grid2">${btn('go','System','sec sm',`data-id="system"`)}${btn('go','Profile','sec sm',`data-id="profile"`)}</div>`}
+function planView(){return `<h1>Improvement plan</h1><p class="c" style="font-size:22px;margin:0 0 20px;font-weight:300">Let’s fix your<br>Start of Downswing</p><div class="col">${DR.map((d,i)=>`<button class="btn" data-a="pickdrill" data-i="${i}" style="justify-content:flex-start;background:${STC[d[1]]};color:#000;font-size:17px;text-transform:none;gap:14px"><span style="width:34px;height:34px;border-radius:50%;background:#fff;display:grid;place-items:center;flex:none">${i+1}</span>${d[0]}<span style="margin-left:auto;font-size:13px">${STL[d[1]]}</span></button>`).join('')}</div><div style="height:24px"></div>${btn('retest','Retest')}`}
+/* ===== Screen 1: System ===== */
+function issues(){const s=S.sys,a=[];
+ if(!s.ble)a.push(['Bluetooth is disconnected',['Switch on the wrist (master) unit','Turn on Bluetooth on your phone','Keep the phone close, then tap Reconnect']]);
+ else{[['hand','Hand'],['wrist','Wrist'],['bicep','Bicep']].forEach(([k,n])=>{if(!s[k])a.push([`${n} sensor not detected`,k==='hand'?['Check the cable connection to the hand sensor','Reseat the connector at both ends','Wait a few seconds for the sensor to reconnect']:[`Check the cable connection to the ${n.toLowerCase()} sensor`,'Reseat the connector at both ends']])})}
+ if(!s.fw)a.push(['Firmware update required',['Keep the wrist unit powered on','Tap Update firmware and wait for completion']]);
+ if(!s.cam)a.push(['Phone camera is off',['Turn the camera switch on']]);
+ else if(!s.pos)a.push(['Phone camera position incorrect',['Place the phone 1.5 m away at 45°','Keep your whole body in frame']]);
+ if(s.cal<100)a.push(['Calibration incomplete',['Open Calibration and follow each pose']]);return a}
+function sysView(){const s=S.sys,iss=issues(),miss=s.ble?[s.hand,s.wrist,s.bicep].filter(v=>!v).length:0;
+ const st=!s.ble?['BLUETOOTH DISCONNECTED','r']:miss?['PARTIAL DISCONNECTION','y']:['ALL SENSORS CONNECTED','g'];
+ const B=[74,81,69],sen=[['hand','Hand','Slave',20],['wrist','Wrist','Master',112],['bicep','Bicep','Slave',250]];
+ const dg=sen.map(([k,n,r,x],i)=>{const w=k==='wrist'?96:52,on=s.ble&&s[k],c=!s.ble?'#6d6e71':on?'#8dc63f':'#ff0040',cx=x+w/2;
+  return `<rect x="${x}" y="52" width="${w}" height="40" rx="9" fill="#1c1d1f" stroke="${on?'#4a4b4e':c}" stroke-width="2"/>${k==='wrist'?'<path d="M140 72h40" stroke="#6d6e71" stroke-width="2" stroke-linecap="round"/>':''}<circle cx="${cx}" cy="22" r="14" fill="${c}"/><path d="${!s.ble?'M'+(cx-6)+' 22h12':on?'M'+(cx-6)+' 22l4 4 8-9':'M'+(cx-5)+' 17l10 10M'+(cx+5)+' 17l-10 10'}" stroke="#000" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="${cx}" y="112" fill="#fff" font-size="13" text-anchor="middle" font-family="Jost">${n.toUpperCase()}${r==='Master'?' · MASTER':''}</text><text x="${cx}" y="127" fill="${c}" font-size="11" text-anchor="middle" font-family="Jost">${!s.ble?'No signal':on?'Connected':'Disconnected'}</text>`}).join('')+
+  `<path d="M72 72H112" stroke="${s.ble&&s.hand?'#8dc63f':'#ff0040'}" stroke-width="3" stroke-dasharray="${s.ble&&s.hand?'0':'5 5'}"/><path d="M208 72H250" stroke="${s.ble&&s.bicep?'#8dc63f':'#ff0040'}" stroke-width="3" stroke-dasharray="${s.ble&&s.bicep?'0':'5 5'}"/>`;
+ const rows=sen.map(([k,n,r],i)=>`<div class="row sp" style="padding:7px 0;border-top:1px solid var(--line)"><span>${n} <span class="mut sm">${r}</span></span><span class="row sm">${s.ble&&s[k]?`<span class="g">${ic('check',16)}Connected</span><span class="mut">Battery ${B[i]}%</span>`:`<span class="${s.ble?'r':'mut'}">${ic(s.ble?'x':'dash',16)}${s.ble?'Disconnected':'No signal'}</span>`}</span></div>`).join('');
+ const pos=s.pos;
+ const cams=`<svg viewBox="0 0 300 170" style="width:100%;max-height:190px" role="img" aria-label="Phone camera position diagram"><circle cx="110" cy="130" r="22" fill="#fff"/><circle cx="110" cy="130" r="8" fill="#000" opacity=".5"/><path d="M110 108V78" stroke="#fff" stroke-width="4"/>${pos?`<rect x="214" y="18" width="30" height="12" rx="2" transform="rotate(45 229 24)" fill="none" stroke="#fff" stroke-width="3"/><path d="M200 38L128 112" stroke="#ff0040" stroke-width="3"/><text x="198" y="92" fill="#fff" font-size="14" font-weight="600" font-family="Jost">1.5 m at 45°</text>`:`<rect x="238" y="108" width="30" height="12" rx="2" fill="none" stroke="#ff0040" stroke-width="3"/><path d="M236 114L134 128" stroke="#ff0040" stroke-width="3" stroke-dasharray="5 5"/><text x="190" y="100" fill="#ff0040" font-size="14" font-family="Jost">too close / too low</text>`}<text x="262" y="30" fill="#a3a4a7" font-size="12" font-family="Jost" opacity="${pos?1:0}">PHONE</text><text x="110" y="168" fill="#a3a4a7" font-size="12" text-anchor="middle" font-family="Jost">USER</text></svg>`;
+ return `<h1>System</h1>
+ <div class="scroll" role="group" aria-label="Demonstration states">${Object.entries(PRESETS).map(([k,v])=>`<button class="chip" data-a="preset" data-k="${k}" aria-pressed="${S.preset===k}">${k} · ${v[0]}</button>`).join('')}</div>
+ <p class="sm mut" style="margin:2px 0 14px">Demo states – simulated, no real Bluetooth connection.</p>
+ <div class="card"><div class="row sp"><b style="font-weight:500">CONNECTION STATUS</b><span class="${st[1]}" style="font-weight:500">${st[0]}</span></div>
+ <svg viewBox="0 0 320 134" style="width:100%;margin:8px 0" role="img" aria-label="Sensor connection diagram">${dg}</svg>${rows}
+ ${!s.ble?btn('reconnect','Reconnect','sec sm',`style="margin-top:10px"`):''}</div>
+ <div class="card"><div class="row sp"><span>Firmware <b style="font-weight:500">v${s.fw?'1.5.0':'1.4.2'}</b></span>${s.fw?`<span class="g row sm">${ic('check',16)}Up to date</span>`:`<span class="y row sm">${ic('warn',16)}v1.5.0 available</span>`}</div>
+ ${!s.fw?btn('fw','Update firmware','pri sm'+(S.fwBusy?' loading':''),`style="margin-top:10px;width:100%" ${S.fwBusy?'disabled':''}`):''}${S.fwBusy?'<div class="bar" style="margin-top:10px"><i id="fwb" style="width:0"></i></div>':''}</div>
+ <div class="card"><div class="row sp"><span class="row">${ic('cam')} Phone camera <b style="font-weight:500">${s.cam?'ON':'OFF'}</b></span><button class="sw" role="switch" aria-checked="${!!s.cam}" aria-label="Phone camera" data-a="cam"></button></div>
+ <div class="row sp" style="margin-top:10px"><span>POSITION</span><span class="${!s.cam?'mut':pos?'g':'r'} row">${s.cam?ic(pos?'check':'x',16)+(pos?'Correct':'Incorrect'):'Camera off'}</span></div>
+ ${s.cam?cams:''}${s.cam&&!pos?btn('fixpos','Mark as repositioned','sec sm',`style="width:100%"`):''}</div>
+ <div class="card"><div class="row sp"><span>Calibration</span><span class="${s.cal>=100?'g':'y'} row sm">${ic(s.cal>=100?'check':'warn',16)}${s.cal>=100?'Complete':s.cal?'Incomplete · '+s.cal+'%':'Not started'}</span></div><div class="bar" style="margin:10px 0"><i style="width:${s.cal}%"></i></div>${btn('go','Calibration','sec sm',`data-id="calib" style="width:100%"`).replace('>Calibration<',s.cal>=100?'>Recalibrate<':'>Start calibration<')}</div>
+ ${iss.length?btn('trouble','Troubleshooting · '+iss.length+' issue'+(iss.length>1?'s':''),'err'):btn('go','Start training','pri',`data-id="drill"`)}`}
+
+/* ===== Screen 2: Profile ===== */
+function profView(){const p=S.prof,ini=p.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+ return `<h1>Profile</h1><div class="c" style="margin-bottom:14px"><div style="width:96px;height:96px;border-radius:50%;margin:0 auto 10px;display:grid;place-items:center;background:var(--s2);border:3px solid var(--g);font-size:34px;font-weight:300" role="img" aria-label="Profile photo placeholder">${ini}</div>
+ <div style="font-size:24px">${p.name}</div><div class="mut">${p.email}</div><p class="sm mut" style="margin-top:4px">Photo placeholder – replace with member photo</p></div>
+ <div class="grid2"><div class="card stat"><b>${p.hcp}</b><span>Handicap</span></div><div class="card stat"><b>${p.hand}</b><span>Handed</span></div></div>
+ <div class="card" ${p.pro?'style="border-color:var(--g)"':''}><div class="row sp"><div><h2 style="margin:0">Membership</h2><div style="font-size:24px;font-weight:500">${p.pro?'Pro':'Standard'}</div><div class="sm mut">Member since March 2025</div></div><span class="badge ${p.pro?'g':'mut'}">${p.pro?'Active':'Free tier'}</span></div>
+ ${p.pro?'':btn('upgrade','Upgrade to Pro','pri',`style="margin-top:12px"`)}</div>
+ <div class="grid2"><div class="card stat"><b>2,184</b><span>Total swings</span></div><div class="card stat"><b>46h 20m</b><span>Training time</span></div><div class="card stat"><b class="g">6 days</b><span>Current streak</span></div><div class="card stat"><b>21 days</b><span>Streak record</span></div></div>
+ <div class="card"><h2>Last 7 days</h2><div class="seg" role="img" aria-label="Trained 6 of the last 7 days">${[1,1,1,1,1,1,0].map(v=>`<i class="${v?'on':''}"></i>`).join('')}</div></div>
+ ${btn('edit','Edit profile','sec')}<p class="sm mut c" style="margin-top:10px">Demonstration data</p>`}
+function editModal(e={}){const p=S.prof;modal(`<h2 style="font-size:20px;color:#fff;letter-spacing:.02em;text-transform:none">Edit profile</h2><form id="pf" novalidate>
+ <label for="fn">Name</label><input id="fn" value="${e.n??p.name}" ${e.en?'aria-invalid="true"':''}><div class="er">${e.en||''}</div>
+ <label for="fe">Email</label><input id="fe" type="email" value="${e.e??p.email}" ${e.ee?'aria-invalid="true"':''}><div class="er">${e.ee||''}</div>
+ <label for="fh">Handicap (0–54)</label><input id="fh" type="number" inputmode="numeric" value="${e.h??p.hcp}" ${e.eh?'aria-invalid="true"':''}><div class="er">${e.eh||''}</div>
+ <label for="fd">Handed</label><select id="fd"><option ${p.hand=='Right'?'selected':''}>Right</option><option ${p.hand=='Left'?'selected':''}>Left</option></select>
+ <div class="grid2" style="margin-top:18px">${btn('closeModal','Cancel','sec','type="button"')}${btn('save','Save','pri'+(e.busy?' loading':''))}</div></form>`)}
+
+/* ===== Screen 3: Calibration ===== */
+const CAL=[[0,'Address position','Stand tall, feet shoulder-width apart, arms hanging naturally.'],[1,'Take away','Turn the club back until it is level with the ground.'],[2,'Top of backswing','Turn your shoulders fully and raise your hands.'],[5,'Finish position','Rotate through and balance on your lead foot.']];
+function calView(){const c=S.cal;if(c.done)return `<h1>Calibration</h1><div class="c" style="padding-top:30px"><svg width="150" height="150" viewBox="0 0 24 24" fill="none" stroke="#8dc63f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="pulse" style="border-radius:50%" aria-hidden="true"><path d="M4 13l5 5L20 6"/></svg><div style="font-size:30px;margin:14px 0 6px">Calibration complete</div><p class="mut" style="margin-bottom:28px">You are aligned and ready to train.</p>${btn('go','Continue to drill training','pri',`data-id="drill"`)}<div style="height:10px"></div>${btn('go','Back to system','sec',`data-id="system"`)}</div>`;
+ const st=CAL[c.step];return `<h1>Calibration</h1><div class="row sp sm"><span>Step ${c.step+1} of ${CAL.length}</span><span class="mut">Demonstration pose</span></div><div class="seg" style="margin:8px 0 12px" aria-hidden="true">${CAL.map((_,i)=>`<i class="${i<c.step||(i==c.step&&c.matched)?'on':''}"></i>`).join('')}</div>
+ <div class="stage" id="cst" style="height:340px"><span class="tag g" style="left:10px;top:10px;border:1px solid var(--g)">Target (ghost)</span><span class="tag" style="right:10px;top:10px;border:1px solid #fff">Current (demo)</span><div id="cav" style="height:100%"></div></div>
+ <div style="margin:14px 0 4px;font-size:22px">${st[1]}</div><p class="mut" id="cin">${st[2]}</p>
+ <div class="row sp" style="margin:12px 0"><span class="row sm" id="cmt">${ic('dash',16)}Move into the ghost pose</span>
+ <span class="row sm"><span class="row" id="hap" style="gap:4px;color:var(--mut)">${ic('vib',16)}Haptic</span><button class="chip" data-a="voice" aria-pressed="${c.voice}">${ic('vol',16)}Voice ${c.voice?'on':'off'}</button></span></div>
+ <div class="grid2">${btn('replay','Replay demo','sec')}${btn('align','Simulate match','pri',c.aligning?'disabled':'')}</div>
+ <p class="sm mut c" style="margin-top:10px">Pose, haptics and voice are simulated. Voice uses browser text-to-speech, not recorded voice-over.</p>`}
+function calTick(dt){const c=S.cal;if(c.done)return;const tg=CAL[c.step][0]/5;
+ if(c.gt!==tg){c.gt+=Math.sign(tg-c.gt)*Math.min(Math.abs(tg-c.gt),dt/1500*Math.max(.35,Math.abs(tg-c.from)));}
+ if(c.aligning&&c.mis>0){c.mis=Math.max(0,c.mis-dt/1100)}
+ if(c.aligning&&c.mis===0&&!c.matched&&c.gt===tg){c.matched=true;buzz();speak('Position matched');setTimeout(()=>{if(S.screen!=='calib')return;if(c.step<CAL.length-1){c.step++;c.from=c.gt;c.mis=.55;c.aligning=c.matched=c.hap=false;speak(CAL[c.step][1]+'. '+CAL[c.step][2])}else{c.done=true;S.sys.cal=100;toast('Calibration complete')}render()},1000)}
+ const cur=cl(tg-.28*c.mis+(c.mis?.015*Math.sin(performance.now()/260):0));const e=$('#cav');if(!e)return;
+ e.innerHTML=avSvg(ball+fig(pose(c.gt),{ghost:1})+fig(pose(cur),{col:c.matched?'#8dc63f':'#e8e9ea'}),'Target ghost pose and current pose');
+ $('#cst').style.boxShadow=c.matched?'inset 0 0 0 3px #8dc63f':'none';
+ $('#cmt').innerHTML=c.matched?`<span class="g row" style="gap:6px">${ic('check',16)}Position matched</span>`:`${ic('dash',16)}${c.aligning?'Aligning…':'Move into the ghost pose'}`;
+ const h=$('#hap');if(h){h.style.color=c.hap?'#8dc63f':'';c.hap&&!h.classList.contains('pulse')&&h.classList.add('pulse')}}
+
+/* ===== Screen 4: Drill ===== */
+function arc(a0,a1,r1,r2){const P=(a,r)=>[100+r*Math.cos(Math.PI-a*Math.PI),100-r*Math.sin(Math.PI-a*Math.PI)].map(v=>v.toFixed(1));const[a,b,c,d]=[P(a0,r2),P(a1,r2),P(a1,r1),P(a0,r1)];return `M${a}A${r2} ${r2} 0 0 1 ${b}L${c}A${r1} ${r1} 0 0 0 ${d}Z`}
+const Z=[[0,.17,'#ff0040'],[.17,.37,'#ecee0e'],[.37,.63,'#8dc63f'],[.63,.83,'#ecee0e'],[.83,1,'#ff0040']];
+function drillView(){const d=S.drill;return `<h1 style="font-size:22px">${dn()}</h1>
+ <div class="stage" style="height:300px"><span class="tag" style="left:10px;top:10px">${d.run?'Simulated training':'Demo loop'}</span><div id="dav" style="height:100%"></div></div>
+ ${d.done?`<div class="c" style="margin:16px 0"><div class="g" style="font-size:26px">Drill complete</div><p class="mut">${d.ok} of ${d.reps} reps inside the green range (simulated).</p></div><div class="grid2">${btn('restart','Repeat drill','sec')}${btn('go','Take shots','pri',`data-id="shots"`)}</div>`:`
+ <p class="c" style="margin:14px 0 2px;font-size:18px">Do <b>10</b> reps at <b>${d.tempo}%</b> tempo</p><p class="c mut" style="font-style:italic">Try to stay within green range</p>
+ <div class="row" style="justify-content:center;gap:10px;margin:8px 0"><button class="chip" data-a="tempo" data-v="-25" aria-label="Decrease tempo" ${d.tempo<=25?'disabled':''}>−</button><span class="sm mut" style="min-width:80px;text-align:center">Tempo ${d.tempo}%</span><button class="chip" data-a="tempo" data-v="25" aria-label="Increase tempo" ${d.tempo>=100?'disabled':''}>+</button></div>
+ ${!d.run?btn('dstart','Start movement','pri'):btn('dpause',d.paused?ic('play',18,1)+'Resume':ic('pause',18)+'Pause','sec')}
+ <svg viewBox="0 0 200 118" style="width:100%;max-width:340px;display:block;margin:6px auto 0" role="img" aria-label="Movement range gauge">${Z.map(z=>`<path d="${arc(z[0],z[1],56,86)}" fill="${z[2]}"/>`).join('')}<g id="ndl"><path d="M100 100L96 100L100 30L104 100Z" fill="#fff" transform="rotate(0 100 100)"/><circle cx="100" cy="100" r="9" fill="#fff"/></g><text x="12" y="112" fill="#fff" font-size="11" font-family="Jost">Over the Top</text><text x="188" y="112" fill="#fff" font-size="11" text-anchor="end" font-family="Jost">Under Plane</text></svg>
+ <div class="c" style="margin:-4px 0 10px"><span style="display:inline-block;border:2px solid #fff;border-radius:50%;width:64px;height:64px;padding-top:8px;line-height:1.1"><b id="rp" style="font-size:22px;font-weight:600">${d.reps}</b><br><span class="sm">10</span></span></div>
+ <div class="row sp sm mut"><span>BOTTOM</span><span style="color:#fff;font-size:18px">SWING</span><span>TOP</span></div><div class="bar" style="margin-top:4px;background:#fff"><i id="sbar" style="width:0;background:var(--g);transition:none"></i></div>`}`}
+function drillTick(dt){const d=S.drill;if(d.done||(d.run&&d.paused))return;if(RM&&!d.run){return}
+ const dur=1200/(d.tempo/100);d.p+=dt/dur;
+ if(d.run){d.fr++;if(Math.abs(d.dev)<.26)d.inr++;const amp=.12+.6*((Math.sin((d.reps+1)*12.9)*43758)%1+1)%1;d.dev=amp*Math.sin(d.p*Math.PI*2+d.reps)}else d.dev=.08*Math.sin(d.p*6.28);
+ if(d.p>=1){d.p=0;if(d.run){d.reps++;if(d.inr/Math.max(1,d.fr)>=.6)d.ok++;d.fr=d.inr=0;if(d.reps>=10){d.done=true;d.run=false;toast('Drill complete');render();return}const r=$('#rp');r&&(r.textContent=d.reps)}}
+ const t=.6*Math.sin(Math.PI*d.p),e=$('#dav');if(e)e.innerHTML=avSvg(ball+trail(t,8,'#8dc63f')+trail(t,6,'#5bc0eb')+fig(pose(t)),'Avatar demonstrating the drill movement');
+ const n=$('#ndl');n&&n.setAttribute('transform',`rotate(${cl(d.dev,-1,1)*90} 100 100)`);const b=$('#sbar');b&&(b.style.width=(d.p*100)+'%')}
+
+/* ===== Screen 5: Shots ===== */
+function shotsView(){const s=S.shots,left=s.need-s.n;
+ if(!s.started)return `<h1>Practice session</h1><h2 class="c" style="font-size:22px;color:#fff;font-weight:300;margin:22px 0 4px">Select club</h2><div class="col" role="radiogroup" aria-label="Club" style="align-items:center;gap:20px;margin:18px 0 26px">${['Driver','7 Iron','Wedge'].map(c=>`<button role="radio" aria-checked="${s.club===c}" data-a="club" data-c="${c}" class="ib" style="width:auto;height:auto;flex-direction:column;gap:6px"><span style="width:62px;height:62px;border-radius:50%;border:2px solid #fff;display:grid;place-items:center"><span style="width:46px;height:46px;border-radius:50%;background:${s.club===c?'var(--g)':'#808080'}"></span></span><span style="font-weight:${s.club===c?600:400}">${c.toUpperCase()}</span></button>`).join('')}</div>${btn('begin','Start','pri')}`;
+ if(s.done)return `<h1>Practice session</h1><div class="c" style="padding-top:24px"><svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#8dc63f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13l5 5L20 6"/></svg><div style="font-size:28px;margin:12px 0 4px">${s.need} / ${s.need} shots completed</div><p class="mut" style="margin-bottom:24px">${s.club} · session finished</p>${btn('go','View results','pri',`data-id="complete"`)}</div>`;
+ return `<h1>Practice session</h1><div class="c mut" role="radiogroup" aria-label="Club"><div class="row" style="justify-content:center;gap:8px;margin-bottom:14px">${['Driver','7 Iron','Wedge'].map(c=>`<button class="chip" role="radio" aria-checked="${s.club===c}" data-a="club" data-c="${c}" ${s.n>0?'disabled':''}>${c}</button>`).join('')}</div></div>
+ <div class="card c" style="padding:26px 14px"><div style="font-size:64px;font-weight:300;line-height:1"><span class="g" id="sn">${pad(s.n)}</span> / ${pad(s.need)}</div><div class="mut" style="letter-spacing:.12em;margin:6px 0 16px">SHOTS COMPLETED</div>
+ <div class="seg" id="ssg" role="img" aria-label="${s.n} of ${s.need} shots">${Array.from({length:s.need},(_,i)=>`<i class="${i<s.n?'on':''}"></i>`).join('')}</div><p style="margin-top:14px;font-size:18px" id="srm">${left} shot${left>1?'s':''} remaining</p></div>
+ <div class="c" style="font-size:24px;margin:20px 0" aria-live="polite">${s.paused?'Paused':s.n?'Keep swinging':'Start swinging'}</div>
+ ${btn('shot','Register demo shot','pri',(s.paused||s.lock?'disabled':''))}<p class="sm mut c" style="margin:8px 0 16px">Prototype: shots are registered manually, not detected by sensors.</p>
+ <div class="grid2">${btn('spause',s.paused?'Resume':'Pause','sec')}${btn('scancel','Cancel','err')}</div>`}
+
+/* ===== Screen 6: Complete ===== */
+function completeView(){const w=(l,t,pos,c,i)=>`<div class="card"><div class="row sp"><h2 style="margin:0;color:${c}">${l}</h2><span class="${i?'r':'g'} row sm">${ic(i?'warn':'check',16)}${i?'Needs work':'Strong'}</span></div><div style="font-size:22px;margin-top:6px">${t}</div><div class="gradbar" role="img" aria-label="${t}: position ${pos}% on a scale from needs work to strong"><i style="left:${pos}%"></i></div><div class="row sp sm mut"><span>Needs work</span><span>Strong</span></div></div>`;
+ return `<div class="c" style="padding-top:6px"><svg width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="#8dc63f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13l5 5L20 6"/></svg><h1 style="margin:6px 0 4px;text-transform:none;font-size:32px">Shots Complete</h1><p class="mut" style="margin-bottom:18px">${S.shots.need} shots · ${S.shots.club}</p></div>
+ ${w('MAIN STRENGTH','Top of Backswing Position',80,'var(--g)',0)}${w('MAIN WEAKNESS','Start of Downswing',6,'var(--red)',1)}
+ <p class="sm mut" style="margin-bottom:12px">Scale positions are illustrative demo values.</p>${btn('go','Overview','pri',`data-id="overview"`)}`}
+
+/* ===== Screen 7: Overview ===== */
+const mkL=i=>`calc(14px + (100% - 28px) * ${i/5})`;
+function ovView(){const grad=PH.map((p,i)=>`${STC[p.st]} ${i*20-10<0?0:i*20-10}% ${i*20+10>100?100:i*20+10}%`).join(',');
+ return `<div class="stage" style="height:330px;margin:0 -20px;border-radius:0"><div id="oav" style="height:100%"></div><span class="tag" style="left:10px;bottom:10px">Avatar replay · illustrative</span></div>
+ <div class="scrub" style="margin-top:14px">${PH.map((p,i)=>`<button class="mk" style="left:${mkL(i)}" data-a="phase" data-i="${i}" aria-label="Phase ${i+1}: ${p.n}" aria-pressed="false">${i+1}</button>`).join('')}<div class="trk" style="background:linear-gradient(90deg,${grad})"></div><input class="sw" type="range" id="scr" min="0" max="1000" aria-label="Swing scrubber" style="outline-offset:0"></div>
+ <div class="row" style="justify-content:center;margin:2px 0 10px">${btn('oplay','','sec sm',`id="opb" style="width:140px" aria-label="Play"`)}</div>
+ <div class="c"><div style="font-size:26px;font-weight:300" id="pn"></div><div id="pf" style="font-size:20px;margin:6px 0"></div><p class="mut" id="pd" style="max-width:340px;margin:0 auto"></p></div>
+ <div style="height:14px"></div>${btn('go','Fix start of downswing','pri',`data-id="plan"`)}`}
+function ovUpd(){const t=S.sw.t,i=Math.round(t*5),p=PH[i];const e=$('#oav');if(!e)return;
+ e.innerHTML=avSvg(ball+trail(t,8,'#8dc63f')+trail(t,6,'#5bc0eb')+fig(pose(t)),`Avatar at ${p.n}`);
+ const r=$('#scr');if(document.activeElement!==r||true)r.value=Math.round(t*1000);
+ document.querySelectorAll('.mk').forEach((m,j)=>m.setAttribute('aria-pressed',j===i));
+ $('#pn').textContent=p.n;$('#pf').innerHTML=`<span style="color:${STC[p.st]}" class="row" style="justify-content:center"><span style="display:inline-flex;vertical-align:middle;margin-right:6px">${ic(p.st==='ok'?'check':'warn',18)}</span>“${p.f}” · ${STL[p.st]}</span>`;$('#pd').textContent=p.d;
+ $('#opb').innerHTML=S.sw.play?ic('pause',18)+'Pause':ic('play',18,1)+'Play';$('#opb').setAttribute('aria-label',S.sw.play?'Pause':'Play')}
+function swTick(dt){if(!S.sw.play)return;S.sw.t+=dt/5500;if(S.sw.t>=1){S.sw.t=1;S.sw.play=false}ovUpd()}
+
+/* ===== Screen 8: Video ===== */
+const fmt=s=>Math.floor(s/60)+':'+pad(Math.floor(s%60));
+function vidView(){const v=S.vid;return `<h1 style="font-size:22px;margin-bottom:2px">${dn()}</h1><p class="c mut" style="margin-bottom:12px">Issue explanation</p>
+ <div class="stage" style="height:340px;background:#dde5e7"><div id="vav" style="height:100%"></div>${VIDEO_SRC?`<video id="vv" src="${VIDEO_SRC}" playsinline preload="metadata" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video>`:''}<button id="vpl" data-a="vplay" aria-label="Play video" style="position:absolute;inset:0;display:grid;place-items:center"><span style="width:88px;height:88px;border-radius:50%;background:#8dc63fcc;display:grid;place-items:center;color:#000">${ic('play',40,1)}</span></button><span class="tag" style="left:10px;bottom:10px;color:#fff">Preview still · simulated playback</span></div>
+ <div class="row" style="margin:12px 0 0;gap:12px"><button class="btn sec sm" id="vtg" data-a="vplay" style="width:52px;padding:0" aria-label="Play"></button><div class="bar" style="flex:1"><i id="vb" style="width:0"></i></div><span class="sm mut" id="vt" style="min-width:74px;text-align:right"></span></div>
+ <p class="sm mut" id="vst" style="margin:10px 0 16px" aria-live="polite"></p>${btn('go','Start drill','pri',`data-id="drill" id="vgo"`)}<div style="height:10px"></div>${VIDEO_SRC?'':btn('vskip','Skip to end (simulated)','sec sm',`style="width:100%"`)}`}
+function vidUpd(){const v=S.vid,t=v.pos/v.dur,e=$('#vav');if(!e)return;
+ if(!VIDEO_SRC)e.innerHTML=avSvg(`<rect width="200" height="270" fill="#dde5e7"/><ellipse cx="100" cy="252" rx="70" ry="5" fill="#000" opacity=".12"/>`+fig(pose(v.play?.6*Math.abs(Math.sin(Math.PI*v.pos/3)):0),{col:'#2a2d30'}),'Instruction still: golfer demonstrating arm and torso separation');
+ $('#vb').style.width=(t*100)+'%';$('#vt').textContent=fmt(v.pos)+' / '+fmt(v.dur);$('#vpl').style.display=(v.play||v.pos>0)?'none':'grid';
+ $('#vtg').innerHTML=v.end?ic('refresh',18):ic(v.play?'pause':'play',18,!v.play);$('#vtg').setAttribute('aria-label',v.end?'Replay':v.play?'Pause':'Play');
+ $('#vst').innerHTML=v.end?`<span class="g row" style="gap:6px">${ic('check',16)}Video complete – drill unlocked</span>`:'Play the video to unlock the drill.';
+ const g=$('#vgo');g.disabled=!v.end}
+function vidTick(dt){const v=S.vid;const vv=$('#vv');if(vv){v.pos=vv.currentTime;v.dur=vv.duration||24;v.play=!vv.paused&&!vv.ended;if(vv.ended)v.end=true;vidUpd();return}if(!v.play)return;v.pos=Math.min(v.dur,v.pos+dt/1000);if(v.pos>=v.dur){v.play=false;v.end=true}vidUpd()}
+
+/* ===== Router / render ===== */
+const VIEWS={home:homeView,plan:planView,system:sysView,profile:profView,calib:calView,drill:drillView,shots:shotsView,complete:completeView,overview:ovView,video:vidView};
+function render(){const m=$('#main');m.innerHTML=(S.hist.length&&S.screen!=='home'?'<button class="chip" data-a="back" style="margin:0 0 6px -6px">‹ Back</button>':'')+VIEWS[S.screen]();persist();
+ const t=SCREENS.concat(EXTRA).find(s=>s[0]===S.screen);document.title=t[1]+' – AXYS Kinetics G1';
+ if(S.screen==='overview')ovUpd();if(S.screen==='video')vidUpd();if(S.screen==='calib'&&!S.cal.done)calTick(0);if(S.screen==='drill'&&!S.drill.done)drillTick(0);
+ if(S.fwBusy)fwAnim()}
+function persist(){try{localStorage.setItem('axys-demo',JSON.stringify({p:S.prof,c:S.sys.cal,f:S.sys.fw}))}catch(e){}}
+(function(){try{const d=JSON.parse(localStorage.getItem('axys-demo')||'null');if(d){S.prof=d.p;S.sys.cal=d.c;S.sys.fw=d.f;S.preset=''}}catch(e){}})();
+function go(id,back){if(id!==S.screen&&!back)S.hist.push(S.screen);if(id==='home')S.hist=[];S.screen=id;S.sw.play=false;S.vid.play=false;if(id==='drill'&&!S.drill.run)S.drill.p=0;if(id==='calib'&&S.sys.cal<100&&S.cal.done){S.cal=mkState().cal}if(id==='calib'&&S.sys.cal>=100&&S.cal.done)S.cal=mkState().cal;drawer(false);render();$('#main').scrollTop=0;if(id==='calib')speak(CAL[S.cal.step][1]+'. '+CAL[S.cal.step][2])}
+function fwAnim(){let t0=performance.now();(function f(n){const b=$('#fwb');if(!b)return;const p=cl((n-t0)/2400);b.style.width=p*100+'%';if(p<1)requestAnimationFrame(f);else{S.fwBusy=false;S.sys.fw=1;S.preset='';toast('Firmware updated to v1.5.0');render()}})(t0)}
+
+/* ===== Actions ===== */
+function act(a,d,el){switch(a){
+ case'menu':drawer(true);break;case'closeMenu':drawer(false);break;case'go':go(d.id);break;case'closeModal':closeModal();break;
+ case'home':go('home');break;case'back':go(S.hist.pop()||'home',1);break;case'begin':S.shots.started=true;render();break;
+ case'pickdrill':S.dn=DR[+d.i][0];S.vid=mkState().vid;S.drill=mkState().drill;go('video');break;
+ case'retest':S.shots=mkState().shots;go('shots');toast('Retest started');break;
+ case'reset':try{localStorage.removeItem('axys-demo')}catch(e){}S=mkState();drawer(false);closeModal();render();toast('Demo reset');break;
+ case'preset':S.preset=d.k;S.sys={...PRESETS[d.k][1]};S.fwBusy=false;render();break;
+ case'reconnect':S.sys.ble=1;S.sys.hand=S.sys.wrist=S.sys.bicep=1;S.preset='';toast('Reconnected (simulated)');render();break;
+ case'fw':S.fwBusy=true;S.sys.fw=0;render();break;
+ case'cam':S.sys.cam=S.sys.cam?0:1;S.preset='';render();break;
+ case'fixpos':S.sys.pos=1;S.preset='';toast('Camera position correct');render();break;
+ case'trouble':modal(`<h2 style="font-size:20px;color:#fff;text-transform:none;letter-spacing:0">Troubleshooting</h2>${issues().map(i=>`<div class="card"><b style="font-weight:500" class="y">${i[0]}</b><ol style="padding-left:20px;margin-top:6px" class="mut">${i[1].map(s=>`<li>${s}</li>`).join('')}</ol></div>`).join('')}${btn('closeModal','Close','sec')}`);break;
+ case'upgrade':modal(`<h2 style="font-size:22px;color:#fff;text-transform:none;letter-spacing:0">AXYS Pro</h2><p class="mut" style="margin:8px 0 14px">Pro benefits will be confirmed by AXYS. Payments are not connected in this prototype.</p>${btn('previewPro','Preview Pro profile','pri')}<div style="height:10px"></div>${btn('closeModal','Not now','sec')}`);break;
+ case'previewPro':S.prof.pro=1;closeModal();toast('Pro preview – no purchase made');render();break;
+ case'edit':editModal();break;
+ case'save':{const n=$('#fn').value.trim(),e=$('#fe').value.trim(),h=$('#fh').value.trim(),er={n,e,h};
+  if(n.length<2)er.en='Enter your name (2+ characters).';if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e))er.ee='Enter a valid email address.';if(!/^\d+$/.test(h)||+h>54)er.eh='Enter a whole number from 0 to 54.';
+  if(er.en||er.ee||er.eh){S.prof.hand=$('#fd').value;editModal(er);toast('Fix the highlighted fields',1);break}
+  editModal({...er,busy:1});setTimeout(()=>{S.prof={...S.prof,name:n,email:e,hcp:+h,hand:$('#fd')?$('#fd').value:S.prof.hand};closeModal();render();toast('Profile saved')},700);break}
+ case'voice':S.cal.voice=!S.cal.voice;render();if(S.cal.voice)speak(CAL[S.cal.step][2]);else speechSynthesis&&speechSynthesis.cancel();break;
+ case'align':S.cal.aligning=true;render();break;
+ case'replay':S.cal.from=CAL[S.cal.step-1]?CAL[S.cal.step-1][0]/5:0;S.cal.gt=S.cal.from;S.cal.mis=.55;S.cal.aligning=S.cal.matched=S.cal.hap=false;render();speak(CAL[S.cal.step][2]);break;
+ case'tempo':S.drill.tempo=cl(S.drill.tempo+ +d.v,25,100);render();break;
+ case'dstart':Object.assign(S.drill,{run:true,paused:false,reps:0,ok:0,p:0,fr:0,inr:0});render();break;
+ case'dpause':S.drill.paused=!S.drill.paused;render();break;
+ case'restart':S.drill=mkState().drill;render();break;
+ case'club':S.shots.club=d.c;render();break;
+ case'shot':{const s=S.shots;if(s.lock||s.paused||s.n>=s.need)break;s.lock=true;s.n++;if(s.n>=s.need){s.done=true;toast('All shots registered');render();setTimeout(()=>s.lock=false,300);break}toast('Shot '+s.n+' registered');render();setTimeout(()=>{s.lock=false;if(S.screen==='shots')render()},450);break}
+ case'spause':S.shots.paused=!S.shots.paused;render();break;
+ case'scancel':if(!S.shots.n){S.shots=mkState().shots;go('home');break}modal(`<h2 style="font-size:20px;color:#fff;text-transform:none;letter-spacing:0">Cancel session?</h2><p class="mut" style="margin:8px 0 16px">${S.shots.n} registered shot${S.shots.n>1?'s':''} will be discarded.</p><div class="grid2">${btn('closeModal','Keep going','pri')}${btn('discard','Discard','err')}</div>`);break;
+ case'discard':closeModal();S.shots=mkState().shots;go('home');toast('Session cancelled');break;
+ case'phase':S.sw.t=+d.i/5;S.sw.play=false;ovUpd();break;
+ case'oplay':if(S.sw.t>=1)S.sw.t=0;S.sw.play=!S.sw.play;ovUpd();break;
+ case'vplay':{if(VIDEO_SRC){const e=$('#vv');if(e.ended)e.currentTime=0;e.paused?e.play():e.pause();break}const v=S.vid;if(v.end){v.pos=0;v.end=false}v.play=!v.play;vidUpd();break}
+ case'vskip':S.vid.pos=S.vid.dur;S.vid.play=false;S.vid.end=true;vidUpd();toast('Simulated completion');break;
+ case'btnstates':drawer(false);modal(`<h2 style="font-size:20px;color:#fff;text-transform:none;letter-spacing:0;margin-bottom:12px">Button states</h2><div class="col">${[['Default',''],['Pressed (hold to see)','is-pressed'],['Disabled','is-disabled'],['Loading','loading'],['Success','ok'],['Error','err']].map(([n,c])=>`<button class="btn pri ${c} ${c==='ok'||c==='err'?'':''}" tabindex="${c?-1:0}">${c==='ok'?ic('check',18):''}${n}</button>`).join('')}<button class="btn sec">Secondary</button></div><p class="sm mut" style="margin:10px 0">Focus ring appears on keyboard focus.</p>${btn('closeModal','Close','sec')}`);break}}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&!b.disabled)act(b.dataset.a,b.dataset,b)});
+document.addEventListener('submit',e=>e.preventDefault());
+document.addEventListener('input',e=>{if(e.target.id==='scr'){S.sw.t=e.target.value/1000;S.sw.play=false;ovUpd()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('#modal').hidden)closeModal();else if($('#drawer').classList.contains('open'))drawer(false)}});
+let last=performance.now();(function tick(n){const dt=Math.min(64,n-last);last=n;const s=S.screen;if(s==='calib')calTick(dt);else if(s==='drill')drillTick(dt);else if(s==='overview')swTick(dt);else if(s==='video')vidTick(dt);requestAnimationFrame(tick)})(last);
+drawer(false);render();
+</script></body></html>
